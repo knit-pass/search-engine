@@ -17,7 +17,7 @@ def get_links(keyword, num=25):
     :return: A list of links
     """
     link_results = []
-    for j in search(keyword, tld="com", num=25, stop=25, pause=10):
+    for j in search(keyword, tld="com", num=num, stop=25, pause=10):
         link_results.append(j)
     print(link_results)
     return link_results
@@ -41,7 +41,7 @@ def get_data(links):
             # Get text content from all the <p> tags from the fetched page
             soup = BeautifulSoup(page, 'html.parser')
             content = soup.findAll('p')
-            # Join each text snippet to a string then appeng it to an array
+            # Join each text snippet to a string then append it to an array
             article = ''
             for i in content:
                 article = article + ' ' + i.text
