@@ -51,5 +51,5 @@ def get_data(links):
     return text_content
 
 
-# if __name__ == "__main__":
-#     print(get_data(get_links("computer science")))
+if __name__ == "__main__":
+    print(get_data(get_links("computer science")))
