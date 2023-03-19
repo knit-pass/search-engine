@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 #                                   logger.py                                  #
 # ---------------------------------------------------------------------------- #
-
+import os
 import logging
 import time
 
@@ -12,6 +12,8 @@ class Logger:
         It creates a log file with a unique name based on the current date and time, 
         and then writes a message to the log file
         """
+        if not os.path.exists("logs"):
+            os.makedirs("logs")
         date_time = time.strftime("%Y-%m-%d_%H-%M-%S")
         log_file_name = f"./logs/{str(date_time)}.log"
         logging.basicConfig(filename=log_file_name, filemode='w', level=logging.INFO,
