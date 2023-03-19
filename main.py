@@ -1,6 +1,7 @@
 import scraper
 import preprocessor
 from utils.logger import Logger
+from utils.writer import Writer
 
 
 def main():
