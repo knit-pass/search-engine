@@ -8,6 +8,7 @@ from googlesearch import search
 # python -m nltk.downloader punkt
 from readability import Readability
 import spacy
+import preprocessor as preprocessor
 
 
 def flesch_kincaid_index(text):
@@ -66,6 +67,29 @@ def depthness(sentence):
     # Print the depth of each token
     for token, depth in zip(doc, depths):
         print(f"{token.text}: {depth}")
+
+def analyse_question(question):
+    question_terms = preprocessor.cleanup_stopwords(question)
+    print(question_terms)
+    question_terms = preprocessor.cleanup_stopwords(question)
+    print(question_terms)
+
+    basic_keywords = ['define', 'list', 'identify', 'describe','who', 'where', 'when', 'what', 'which']
+    intermediate_keywords = ['compare', 'contrast', 'analyze', 'evaluate','why', 'how']
+    advanced_keywords = ['critique', 'hypothesize', 'propose', 'explore', 'justify']
+
+    score = 0
+    for word in question_terms:
+        if word in basic_keywords:
+            score = score + 2
+        elif word in intermediate_keywords:
+            score = score + 5
+        elif word in advanced_keywords:
+            score = score + 10
+        else: 
+            score = score + 1
+    print("Weightage of the question = " + str(score))
+
 
 
 if __name__ == "__main__":
