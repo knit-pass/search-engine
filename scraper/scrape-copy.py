@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from googlesearch import search
+import wikipediaapi
 
 
 def get_links(keyword, num=10):
