@@ -16,8 +16,13 @@ class Logger:
             os.makedirs("logs")
         date_time = time.strftime("%Y-%m-%d_%H-%M-%S")
         log_file_name = f"./logs/{str(date_time)}.log"
-        logging.basicConfig(filename=log_file_name, filemode='w', level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+        logging.basicConfig(
+            filename=log_file_name,
+            filemode="w",
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            datefmt="%d-%b-%y %H:%M:%S",
+        )
         logging.info("Log - START")
 
     def write_info(msg):

@@ -53,8 +53,7 @@ class WikiGraph:
     def adj_matrix_directed_csr(self) -> Optional[csr_matrix]:
         """Directed adjacency matrix of Wikipedia topics in sparse CSR format."""
         if self._adj_matrix_directed_csr is None:
-            matrix_path = os.path.join(
-                self.data_root, "wikigraph_directed_csr.npz")
+            matrix_path = os.path.join(self.data_root, "wikigraph_directed_csr.npz")
             if not os.path.exists(matrix_path):
                 print(
                     "Downloading wikigraph_directed_csr.npz..."
@@ -108,8 +107,7 @@ class WikiGraph:
                     "Downloading index.pkl... (may take several minutes as it is 1 GB)"
                 )
                 urllib.request.urlretrieve(
-                    os.path.join(S3_DATA_ROOT, "index.pkl"),
-                    index_path,
+                    os.path.join(S3_DATA_ROOT, "index.pkl"), index_path,
                 )
             print(f"Loading {index_path} to memory...")
             self._topic_index_map = pickle.load(open(index_path, "rb"))
@@ -120,8 +118,7 @@ class WikiGraph:
     def index_topic_map(self) -> Dict[int, str]:
         """Dictionary mapping from index in adjacency matrices to topic."""
         if self._index_topic_map is None:
-            self._index_topic_map = {v: k for k,
-                                     v in self.topic_index_map.items()}
+            self._index_topic_map = {v: k for k, v in self.topic_index_map.items()}
         return self._index_topic_map
 
     def set_graph(self, topic_children_tuples: List[Tuple[str, List[str]]]):
@@ -151,8 +148,7 @@ class WikiGraph:
                     idx += 1
                 vertices.append([topic_idx, child_idx])
         self._adj_matrix_directed_csr = csr_matrix(
-            ([1 for _ in range(len(vertices))], list(zip(*vertices))),
-            shape=[idx, idx],
+            ([1 for _ in range(len(vertices))], list(zip(*vertices))), shape=[idx, idx],
         )
         self._adj_matrix_directed_csc = None
         self._adj_matrix_undirected_csr = None
@@ -167,10 +163,7 @@ class WikiGraph:
             return False
         return True
 
-    def get_standard(
-        self,
-        topic: str,
-    ) -> str:
+    def get_standard(self, topic: str,) -> str:
         return topic.lower()
 
     def get_shortest_paths_info(
@@ -248,23 +241,20 @@ class WikiGraph:
                 # Expand source frontier.
                 new_src_frontier = set()
                 for topic in src_frontier:
-                    unvisited = self._get_children(
-                        topic, directed) - src_visited
+                    unvisited = self._get_children(topic, directed) - src_visited
                     if no_paths:
                         # Number of ways to get to child is sum of number of ways to
                         # get to ancestors.
                         topic_path_count = src_ancestors[topic]
                         _ = [
                             # src_ancestors.update({child: topic_path_count})
-                            update_counter(src_ancestors, child,
-                                           topic_path_count)
+                            update_counter(src_ancestors, child, topic_path_count)
                             for child in unvisited
                         ]
                     else:
                         # Otherwise, just keep track of ancestors, so we can rebuild
                         # the path later.
-                        _ = [src_ancestors[child].add(
-                            topic) for child in unvisited]
+                        _ = [src_ancestors[child].add(topic) for child in unvisited]
                     new_src_frontier |= unvisited
                 src_frontier = new_src_frontier
                 src_visited |= src_frontier
@@ -272,15 +262,13 @@ class WikiGraph:
                 # Expand target frontier.
                 new_tgt_frontier = set()
                 for topic in tgt_frontier:
-                    unvisited = self._get_ancestors(
-                        topic, directed) - tgt_visited
+                    unvisited = self._get_ancestors(topic, directed) - tgt_visited
                     if no_paths:
                         # Symmetrical to from-source case.
                         topic_path_count = tgt_children[topic]
                         _ = [
                             # tgt_children.update({ancestor: topic_path_count})
-                            update_counter(
-                                tgt_children, ancestor, topic_path_count)
+                            update_counter(tgt_children, ancestor, topic_path_count)
                             for ancestor in unvisited
                         ]
                     else:
@@ -306,8 +294,7 @@ class WikiGraph:
 
         if no_paths:
             num_paths = sum(
-                [src_ancestors[topic] * tgt_children[topic]
-                    for topic in bridge_topics]
+                [src_ancestors[topic] * tgt_children[topic] for topic in bridge_topics]
             )
             return (deg_sep, num_paths, None)
 
@@ -338,8 +325,7 @@ class WikiGraph:
             children = tgt_children[path[-1]]
             for child in children:
                 if child == tgt_idx:
-                    path = [index_topic_map[x]
-                            for x in path] + [index_topic_map[child]]
+                    path = [index_topic_map[x] for x in path] + [index_topic_map[child]]
                     bridge_to_tgt_paths[path[0]].append(path)
                 else:
                     frontier.append(path + [child])
@@ -418,7 +404,7 @@ class WikiGraph:
             adj_mat_csr = self.adj_matrix_undirected_csr
             res = set(
                 adj_mat_csr.indices[
-                    adj_mat_csr.indptr[topic]: adj_mat_csr.indptr[topic + 1]
+                    adj_mat_csr.indptr[topic] : adj_mat_csr.indptr[topic + 1]
                 ]
             )
         return res
@@ -427,7 +413,7 @@ class WikiGraph:
         adj_mat_csr = self.adj_matrix_directed_csr
         return set(
             adj_mat_csr.indices[
-                adj_mat_csr.indptr[topic]: adj_mat_csr.indptr[topic + 1]
+                adj_mat_csr.indptr[topic] : adj_mat_csr.indptr[topic + 1]
             ]
         )
 
@@ -435,13 +421,12 @@ class WikiGraph:
         adj_mat_csc = self.adj_matrix_directed_csc
         return set(
             adj_mat_csc.indices[
-                adj_mat_csc.indptr[topic]: adj_mat_csc.indptr[topic + 1]
+                adj_mat_csc.indptr[topic] : adj_mat_csc.indptr[topic + 1]
             ]
         )
 
     def __str__(self):
-        num_topics = len(
-            self._topic_index_map) if self._topic_index_map else None
+        num_topics = len(self._topic_index_map) if self._topic_index_map else None
         return (
             f"WikiGraph(num_topics={num_topics or '<uninitialized>'}"
             f", optimize_memory={self._optimize_memory})"

@@ -3,21 +3,53 @@
 # ---------------------------------------------------------------------------- #
 import re
 import nltk
-from googlesearch import search
-# pip install py-readability-metrics
-# python -m nltk.downloader punkt
-from readability import Readability
 import spacy
-import preprocessor as preprocessor
+from spacy_readability import Readability
+from googlesearch import search
+from nltk.corpus import stopwords
+
+nlp = spacy.load("en")
+nlp.add_pipe(Readability())
 
 
-def flesch_kincaid_index(text):
-    text1 = "Quantum computing is a rapidly-emerging technology that harnesses the laws of quantum mechanics to solve problems too complex for classical computers. Today, IBM Quantum makes real quantum hardware -- a tool scientists only began to imagine three decades ago -- available to hundreds of thousands of developers. Our engineers deliver ever-more-powerful superconducting quantum processors at regular intervals, alongside crucial advances in software and quantum-classical orchestration. This work drives toward the quantum computing speed and capacity necessary to change the world.These machines are very different from the classical computers that have been around for more than half a century. Here's a primer on this transformative technology."
-    text2 = "On a windy winter morning, a woman looked out of the window.The only thing she saw, a garden. A smile spread across her face as she spotted Maria, her daughter, in the middle of the garden enjoying the weather. It started drizzling. Maria started dancing joyfully.She tried to wave to her daughter, but her elbow was stuck, her arm hurt, her smile turned upside down. Reality came crashing down as the drizzle turned into a storm. Maria's murdered corpse consumed her mind.On a windy winter morning, a woman looked out of the window of her jail cell. this is end of the story"
-    r = Readability(text)
-    fk = r.flesch_kincaid()
-    print(fk.score)
-    print(fk.grade_level)
+def cleanup_stopwords(s):
+    """
+    It takes a string as input, tokenizes it, removes stopwords, and returns a list of tokens
+
+    :param s: The string to be cleaned up
+    :return: A list of words that are not stopwords and are longer than 2 characters.
+    """
+    required = ["who", "where", "when", "why", "what", "which", "how"]
+    stopset = set(stopwords.words("english")) - set(required)
+    tokens = nltk.word_tokenize(s)
+    cleanup = [
+        token.lower()
+        for token in tokens
+        if token.lower() not in stopset and len(token) > 2
+    ]
+    return cleanup
+
+
+def get_indices(text):
+    """
+    It takes a string of text, runs it through the spaCy pipeline, and returns a dictionary of
+    readability scores
+
+    :param text: The text to be analyzed
+    :return: A dictionary with the keys being the name of the readability index and the values being the
+    readability index score.
+    """
+    doc = nlp(text)
+    indices = {
+        "fk_grade": round(doc._.flesch_kincaid_grade_level, 2),
+        "fk_readability": round(doc._.flesch_kincaid_reading_ease, 2),
+        "dale_chall": round(doc._.dale_chall, 2),
+        "smog": round(doc._.smog, 2),
+        "cl_index": round(doc._.coleman_liau_index, 2),
+        "ar_index": round(doc._.automated_readability_index, 2),
+        "forcast": round(doc._.forcast, 2),
+    }
+    return indices
 
 
 def is_noun(pos):
@@ -37,16 +69,26 @@ def get_concepts(sentence):
     nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if is_noun(pos)]
     return nouns
 
-def degree_of_separation():
+
+def degree_of_separation(source, destination):
+    """
+    It takes two Wikipedia page titles as input, and returns the shortest path between them
+
+    :param source: The source node
+    :param destination: The destination page
+    :return: The shortest path between the source and destination.
+    """
     wg = WikiGraph()
-    paths = wg.get_shortest_paths_info('Backpropagation', 'Data Science')
-    paths
+    paths = wg.get_shortest_paths_info(source, destination)
+    return paths
 
 
 def depthness(sentence):
-    # Load the English language model for spaCy
-    nlp = spacy.load("en_core_web_sm")
+    """
+    It takes a sentence, parses it with spaCy, and then counts the depth of each token in the sentence
 
+    :param sentence: The sentence to parse
+    """
     # Parse the sentence using spaCy's dependency parser
     doc = nlp(sentence)
 
@@ -68,15 +110,24 @@ def depthness(sentence):
     for token, depth in zip(doc, depths):
         print(f"{token.text}: {depth}")
 
-def analyse_question(question):
-    question_terms = preprocessor.cleanup_stopwords(question)
-    print(question_terms)
-    question_terms = preprocessor.cleanup_stopwords(question)
+
+def analyze_question(question):
+    question_terms = cleanup_stopwords(question)
     print(question_terms)
 
-    basic_keywords = ['define', 'list', 'identify', 'describe','who', 'where', 'when', 'what', 'which']
-    intermediate_keywords = ['compare', 'contrast', 'analyze', 'evaluate','why', 'how']
-    advanced_keywords = ['critique', 'hypothesize', 'propose', 'explore', 'justify']
+    basic_keywords = [
+        "define",
+        "list",
+        "identify",
+        "describe",
+        "who",
+        "where",
+        "when",
+        "what",
+        "which",
+    ]
+    intermediate_keywords = ["compare", "contrast", "analyze", "evaluate", "why", "how"]
+    advanced_keywords = ["critique", "hypothesize", "propose", "explore", "justify"]
 
     score = 0
     for word in question_terms:
@@ -86,11 +137,15 @@ def analyse_question(question):
             score = score + 5
         elif word in advanced_keywords:
             score = score + 10
-        else: 
+        else:
             score = score + 1
     print("Weightage of the question = " + str(score))
 
 
-
 if __name__ == "__main__":
+    print(get_indices("What is a computer?"))
+    print(get_indices("What are algorithms?"))
+    print(get_indices("What is android?"))
+    print(get_indices("What is artifical intelligence?"))
+    print(get_indices("How can artifical intelligence improve lives?"))
     pass

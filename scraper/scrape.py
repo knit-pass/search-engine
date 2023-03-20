@@ -39,12 +39,12 @@ def get_data(links):
             # Function call to open a page
             page = urlopen(url)
             # Get text content from all the <p> tags from the fetched page
-            soup = BeautifulSoup(page, 'html.parser')
-            content = soup.findAll('p')
+            soup = BeautifulSoup(page, "html.parser")
+            content = soup.findAll("p")
             # Join each text snippet to a string then append it to an array
-            article = ''
+            article = ""
             for i in content:
-                article = article + ' ' + i.text
+                article = article + " " + i.text
             text_content.append(article)
         except:
             continue
