@@ -4,9 +4,11 @@
 import re
 import nltk
 import spacy
+from prettytable import PrettyTable
 from spacy_readability import Readability
 from googlesearch import search
 from nltk.corpus import stopwords
+from .wikilinks import *
 
 nlp = spacy.load("en")
 nlp.add_pipe(Readability())
@@ -142,10 +144,38 @@ def analyze_question(question):
     print("Weightage of the question = " + str(score))
 
 
+def get_readability_report(sentence):
+    """
+    It takes a sentence as input, and returns a table with the readability indices for that sentence
+
+    :param sentence: The sentence you want to analyze
+    """
+    x = PrettyTable()
+    print("\n")
+    print("Sentence: ", sentence)
+    x.field_names = ["Index", "Value"]
+    indices = get_indices(sentence)
+    x.add_row(["Flesch-Kincaid Grade", indices["fk_grade"]])
+    x.add_row(["Flesch-Kincaid Readability", indices["fk_readability"]])
+    x.add_row(["Dale Chall", indices["dale_chall"]])
+    x.add_row(["Smog", indices["smog"]])
+    x.add_row(["Coleman Liau Index,", indices["cl_index"]])
+    x.add_row(["Automated Readability Index,", indices["ar_index"]])
+    x.align = "l"
+    print(x)
+    print("\n")
+    print("\n")
+
+
+def get_wiki_pairs(query):
+    concepts = get_concepts(query)
+    wiki_pages = []
+    for i in concepts:
+        wiki_pages.append(get_nearest_wiki_links(i)[0])
+    return wiki_pages
+
+
 if __name__ == "__main__":
-    print(get_indices("What is a computer?"))
-    print(get_indices("What are algorithms?"))
-    print(get_indices("What is android?"))
-    print(get_indices("What is artifical intelligence?"))
-    print(get_indices("How can artifical intelligence improve lives?"))
+    get_readability_report("What is a computer?")
+    get_readability_report("How can artifical intelligence improve lives?")
     pass

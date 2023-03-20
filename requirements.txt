@@ -1,4 +1,7 @@
-beautifulsoup4==4.11.2
+beautifulsoup4==4.12.0
 nltk==3.7
+prettytable==3.6.0
 requests==2.27.1
 scipy==1.8.0
+spacy==3.5.1
+spacy_readability==1.4.1

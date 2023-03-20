@@ -2,10 +2,10 @@ import requests
 from pywikigraph import WikiGraph
 
 
-def shortest_path_test():
+def get_shortest_path(source, dest):
     wg = WikiGraph()
-    paths = wg.get_shortest_paths_info("Alan Turing", "Semantic Web")
-    print(paths)
+    paths = wg.get_shortest_paths_info(source, dest)
+    return paths[0]
 
 
 def get_nearest_wiki_links(keyword):
