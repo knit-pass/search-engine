@@ -1,13 +1,13 @@
 # ---------------------------------------------------------------------------- #
 #                                  Process.py                                  #
 # ---------------------------------------------------------------------------- #
-
+import re
 import nltk
-from pywikigraph import WikiGraph
-my_loader = WikiGraph.data_root='../py'
+from googlesearch import search
 
 
-def is_noun(pos): return pos[:2] == 'NN'
+def is_noun(pos):
+    return pos[:2] == "NN"
 
 
 def get_concepts(sentence):
@@ -29,4 +29,4 @@ def degree_of_separation():
     paths
 
 if __name__ == "__main__":
-    print(get_concepts("What makes computer better than humans?"))
+    pass
