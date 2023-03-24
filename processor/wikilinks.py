@@ -1,11 +1,12 @@
 import requests
 from pywikigraph import WikiGraph
 
+wg = WikiGraph()
+
 
 def get_shortest_path(source, dest):
-    wg = WikiGraph()
     paths = wg.get_shortest_paths_info(source, dest)
-    return paths[0]
+    return paths
 
 
 def get_nearest_wiki_links(keyword):
